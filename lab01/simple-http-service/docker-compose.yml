@@ -1,0 +1,24 @@
+version: "3.3"
+services:
+  appserver:
+    image: st<username>vm101.rtb-lab.pl/appserver:latest
+    ports:
+      - "8000:8000"
+    deploy:
+      replicas: 5
+
+# Helpful commands for docker-compose
+
+# sudo apt-get install docker-compose
+# sudo docker-compose up -d
+# sudo docker-compose down
+# sudo docker-compose ps
+
+# Helpful commands for Docker Stacks
+
+# sudo docker stack deploy --compose-file docker-compose.yml appserver
+# sudo docker stack services appserver
+# sudo docker stack ls
+# sudo docker stack ps appserver
+# sudo docker stack rm appserver
+# sudo docker service update appserver_appserver --force
