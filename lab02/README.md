@@ -35,7 +35,7 @@ Execute the below steps.
 
 Add PostgreSQL repository, key and update the packages list:
 ```bash
-cd lab06 
+cd lab02/files
 sudo docker-compose up -d
 ```
 Please confirm that all containers are up and running.
@@ -141,7 +141,7 @@ This part will help you understand what is role of etcd service in patroni clust
 
 Log into container demo-etcdX
 ```bash
-sudo docker exec -ti demo-extdX bash
+sudo docker exec -ti demo-etcdX bash
 postgres@etcd1:~$ etcdctl member list
 ```
 How many nodes do you see ? 
@@ -220,8 +220,7 @@ sudo docker exec -ti demo-patroniX patronictl list
 On master
 
 ```bash
-sudo docker exec -ti demo-patroniX
-psql
+sudo docker exec -ti demo-patroniX psql
 ```
 
 Now you are in PostgreSQL.
@@ -246,7 +245,7 @@ Below command run on slave node
 ```bash
 sudo docker exec -ti demo-patroniX psql
 postgres=# select pg_is_in_recovery();
-"
+```
 
 Output should be like below
 ```bash
