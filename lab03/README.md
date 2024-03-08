@@ -142,6 +142,30 @@ The schema registry listens on TCP port **8990** by default.
 
 ## 4. Running the CRUD Application
 
+### 4.1 About the application
+
+The application in `lab03/nosql` directory is a simple CRUD application written in Java and (Spring Boot)[https://spring.io/projects/spring-boot] framework, which writes and reads data from your Aerospike cluster.
+
+The application implements a very simple REST API with the following operations available:
+
+ - GET `/endpoint/{id}` - returns `Message` stored in Aerospike with given `id`
+ - PUT `/endpoint/{id}` - writes `Message` sent in a HTTP request body and returns the written content back
+ - GET `/endpoint/increment/{id}` - increments the `count` field value in Message for the Message with given `id`
+
+A `Message` is defined using Apache Avro schema at the following location in repository:
+`lab03/nosql/src/main/resources/schema/Message.avsc`
+
+**Remember to rebuild and rerun the application after every change in the `Message` schema.**
+
+A `Message` class source file is generated in the following location: `lab03/nosql/src/main/generated/java/com/rtbhouse/nosqllab/Message.java`
+
+The supported operations are defined in the `lab03/nosql/src/main/java/com/rtbhouse/nosqllab/resource/NosqlResource.java` source file.
+
+All database related operations are implemented in the `lab03/nosql/src/main/java/com/rtbhouse/nosqllab/dao/MessageDao.java` source file.
+
+
+### 4.2 Running the application
+
 Clone the repository to **your** computer:
 ```bash
 git clone https://github.com/RTBHOUSE/mimuw-lab2024L.git
@@ -221,13 +245,14 @@ field alias:
   "type": "record", "name": "Message",
   "fields": [
     {"name": "id", "type": "long"},
-    {"name": "field2", "type": ["null", "string"], "default": null, "aliases": ["field1"]}
+    {"name": "field2", "type": ["null", "string"], "default": null, "aliases": ["field1"]},
+    {"name": "counter", "type": ["null", "long"], "default": null}
   ]
 }
 ```
 **Be sure to rebuild and re-run the application afterwards!**
 
-Reading any previously written record should return it contents but with the new `field2` name.
+Reading any previously written record should return its contents but with the new `field2` name.
 
 You can add some more changes to the schema, like an additional field, etc.
 What kind of change would break the schema compatibility?
@@ -247,7 +272,7 @@ sudo systemctl start aerospike
 
 ### 5.4 Provide endpoint for the `MessageDao.count()` operation mapped to the HTTP GET method.
 
-The method is already implemented using UDF (User Defined Function) written in lua. Just provide the endpoint in the `NosqlResource` class.
+The method is already implemented using UDF (User Defined Function) written in lua (`lab03/nosql/src/main/resources/udf/count.lua`), and registered in the `MessageDao` class. Just provide a proper endpoint, which invokes the method in the `NosqlResource` class.
 
 ### 5.5 Fix the implementation for the increment operation
 
@@ -279,9 +304,10 @@ Hint 4: Read how alternatively the atomic counters could be implemented in [Aero
 
 ### 5.6 Reimplement the count method to use the database scan.
 
-Consult the *[documentation](https://developer.aerospike.com/client/java/usage/scan/scan_record)*.
+Look at the simple Scan Operations *[example](https://reintech.io/blog/aerospike-scan-operations-best-practices-data-retrieval)*.
 
-Hint: define a private static class to implement the `ScanCallback` and to retain the count value.
+Hint 1: define a `private static class` to implement the `ScanCallback` and to retain the count value.
+Hint 2: use `LongAdder` or `AtomicLong` class to hold the count value.
 
 ### 5.7 Set the TTL of the record to 30 seconds in the `put` method.
 
@@ -305,4 +331,4 @@ Hint: Set the appropriate option in the `SchemaRegistryConfig` class.
 
 Your laboratory cluster is configured to use in memory data storage by default. Change the storage configuration for data to become persistent.
 
-Hint: edit the proper aeropike.conf file section.
+Hint: edit the proper `aerospike.conf` file section.
