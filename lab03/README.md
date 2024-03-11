@@ -126,7 +126,7 @@ Download the Schema Registry jar file:
 wget https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-schema-registry-server/1.1.5/spring-cloud-schema-registry-server-1.1.5.jar
 ````
 
-Run the Schema Registry as a foreground process:
+Run the Schema Registry as a background process:
 ```bash
 java -jar spring-cloud-schema-registry-server-1.1.5.jar > registry.log &
 ```
