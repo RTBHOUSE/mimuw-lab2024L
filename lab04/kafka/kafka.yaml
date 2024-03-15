@@ -1,0 +1,167 @@
+---
+- name: Download Kafka binaries
+  any_errors_fatal: true
+  hosts: kafka
+
+  tasks:
+
+     - name: Populate service facts
+       ansible.builtin.service_facts:
+
+     - name: Ensure group "kafka" exists
+       become: true
+       group:
+              name: kafka
+              state: present
+
+     - name: Ensure user "kafka" exists
+       become: true
+       user:
+              name: kafka
+              home: /opt/kafka
+              state: present
+              group: kafka
+
+     - name: Create kafka home directory
+       become: true
+       file:
+              path: /opt/kafka
+              state: directory
+              mode: 0755
+              owner: kafka
+              group: kafka
+
+     - name: Download Kafka
+       become: true
+       get_url:
+              url: https://downloads.apache.org/kafka/3.3.2/kafka_2.12-3.3.2.tgz
+              dest: ~/kafka.tgz
+              force: true
+       when: ansible_facts.services['kafka.service'] is not defined and ansible_facts.services['zookeeper.service'] is not defined
+
+     - name: Decompress Kafka
+       become: true
+       become_user: root
+       command: bash -c "tar xzvf ~/kafka.tgz -C /opt/kafka --strip-components=1"
+       when: ansible_facts.services['kafka.service'] is not defined and ansible_facts.services['zookeeper.service'] is not defined
+
+     - name: Chown kafka binaries
+       become: true
+       file:
+              dest: /opt/kafka
+              owner: kafka
+              group: kafka
+              recurse: yes
+       when: ansible_facts.services['kafka.service'] is not defined and ansible_facts.services['zookeeper.service'] is not defined
+
+     - name: Install JRE
+       become: true
+       apt:
+              name: openjdk-11-jdk-headless
+              state: latest
+
+- name: Configure Zookeeper
+  any_errors_fatal: true
+  hosts: kafka
+
+  tasks:
+
+     - name: Copy config file with owner and permissions
+       become: true
+       register: service_conf
+       template:
+             src: zookeeper.properties.j2
+             dest: /opt/kafka/config/zookeeper.properties
+             owner: kafka
+             group: kafka
+             mode: 0644
+
+     - name: Create zookeeper state directory
+       become: true
+       file:
+             path: /opt/kafka/zookeeper
+             state: directory
+             mode: 0755
+             owner: kafka
+             group: kafka
+
+     - name: Create myid file
+       become: true
+       command: bash -c "echo "{{ ansible_facts.eth0.ipv4.address.split(".")[3]}}" > /opt/kafka/zookeeper/myid"
+
+     - name: Copy service file with owner and permissions
+       become: true
+       copy:
+             src: zookeeper.service
+             dest: /etc/systemd/system/zookeeper.service
+             owner: root
+             group: root
+             mode: 0644
+
+     - name: Ensure the Zookeeper daemon is enabled
+       become: true
+       become_user: root
+       systemd:
+             name: zookeeper
+             state: started
+             enabled: yes
+             daemon_reload: yes
+
+     - name: Restart daemon on config change
+       become: true
+       become_user: root
+       systemd:
+             name: zookeeper
+             state: restarted
+       when: service_conf.changed
+
+- name: Configure Kafka
+  any_errors_fatal: true
+  hosts: kafka
+
+  tasks:
+
+     - name: Copy config file with owner and permissions
+       become: true
+       register: service_conf
+       template:
+             src: server.properties.j2
+             dest: /opt/kafka/config/server.properties
+             owner: kafka
+             group: kafka
+             mode: 0644
+
+     - name: Create kafka logs directory
+       become: true
+       file:
+             path: /opt/kafka/kafka-logs
+             state: directory
+             mode: 0755
+             owner: kafka
+             group: kafka
+
+     - name: Copy service file with owner and permissions
+       become: true
+       copy:
+             src: kafka.service
+             dest: /etc/systemd/system/kafka.service
+             owner: root
+             group: root
+             mode: '0644'
+
+     - name: Ensure the Kafka daemon is enabled
+       become: true
+       become_user: root
+       systemd:
+             name: kafka
+             state: started
+             enabled: yes
+             daemon_reload: yes
+
+     - name: Restart daemon on config change
+       become: true
+       become_user: root
+       systemd:
+             name: kafka
+             state: restarted
+       when: service_conf.changed
