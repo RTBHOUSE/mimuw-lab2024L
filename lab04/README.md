@@ -421,7 +421,7 @@ $ /opt/kafka/bin/kafka-topics.sh --create --topic my_third_topic --partitions 10
 
 4. Run the application:
 ```bash
-$ java -jar mimuw-lab2024L/lab04/kafka-producer/target/kafka-producer-1.0-SNAPSHOT.jar
+$ java -jar target/kafka-producer-1.0-SNAPSHOT.jar
 ```
 
 5. Check how many messages have been produced:

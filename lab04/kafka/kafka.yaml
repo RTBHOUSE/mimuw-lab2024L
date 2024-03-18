@@ -34,7 +34,7 @@
      - name: Download Kafka
        become: true
        get_url:
-              url: https://downloads.apache.org/kafka/3.3.2/kafka_2.12-3.3.2.tgz
+              url: https://archive.apache.org/dist/kafka/3.3.2/kafka_2.12-3.3.2.tgz
               dest: ~/kafka.tgz
               force: true
        when: ansible_facts.services['kafka.service'] is not defined and ansible_facts.services['zookeeper.service'] is not defined
