@@ -514,7 +514,23 @@ public class PurchaseProcessor implements Processor<String, String, String, Stri
 
 9. Compile and run the application again.
 
-## 5. Read more about Kafka Streams
+## 5. Clearing the streaming application state
+
+You have probably noticed that the processor stores grow infinitely, and all the mocked database records are updated
+on every punctuate callback. This is suboptimal, because we want to update the database only with `UserProfiles` which have been modified recently.
+
+To achieve that, modify the streaming application according to following steps:
+
+1. Make the `DatabaseMock` stateful, so that it holds `UserProfile`'s in a `HashMap`.
+2. Modify the `DatabaseMock` to additively update the values in `UserProfile`'s (add `count` and `sum` to preexisting `UserProfile` values).
+3. Clear the streaming application state on every punctuate callback (put `KeyValue`'s with `null` values for every item in the state stores).
+
+After applying these steps verify that the state is cleared and the values are consistent in the `DatabaseMock`.
+Will these values be still consistent in case of `PurchaseProcessor` failure during Kafka offsets commit? Can you think of ways to provide **exactly-once** semantics when an external database is accessed in the streaming application?
+
+**Hint:** think how to achieve idempotence when updating records on the external databse.
+
+## 6. Read more about Kafka Streams
 1. *[Kafka Streams core concepts](https://kafka.apache.org/33/documentation/streams/core-concepts)*
 2. *[Kafka Streams developer guide](https://kafka.apache.org/33/documentation/streams/developer-guide/)*
 3. *[More Kafka Streams examples](https://docs.confluent.io/platform/current/streams/code-examples.html#java)*
