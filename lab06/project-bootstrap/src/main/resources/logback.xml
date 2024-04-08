@@ -1,0 +1,15 @@
+<configuration>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{ISO8601} [%t] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+<!--    <logger name="reactor.netty.http.client.HttpClientConnect$HttpObserver" level="ERROR" />-->
+
+</configuration>
