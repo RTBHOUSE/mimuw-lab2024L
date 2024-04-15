@@ -29,7 +29,7 @@ in the Object Storage process memory.
 ### Object Storage constraints and requirements
 
 - each DataNode can store up to 1024 bytes of data and up to 750 files
-- the metadata KVS has limited number of storage (so it can be used only for storing metadata)
+- the metadata KVS has limited storage (so it can be used only for storing metadata)
 - every object name is no longer than 10 bytes
 - Object Storage should be able to store 250 objects per every data node in the system
 - Object Storage should be able to store files larger than single DataNode capacity
