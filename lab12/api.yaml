@@ -1,0 +1,56 @@
+swagger: "2.0"
+info:
+  description: "https://github.com/RTBHOUSE/mimuw-lab2023L/tree/main/lab12"
+  version: "1.0.0"
+  title: "contests tasks checker"
+host: "stXXXvmYYY.rtb-lab.pl:8034"
+schemes:
+- "http"
+paths:
+  /tasks/{task_id}/score:
+    post:
+      tags:
+        - "score"
+      description: ""
+      consumes:
+      - "text/plain"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Source code"
+        required: true
+        schema:
+          type: "string"
+      - in: "path"
+        name: "task_id"
+        required: true
+        type: "string"
+        default: "sort"
+      - in: "query"
+        name: "lang"
+        required: true
+        type: "string"
+        enum:
+          - "c++"
+      responses:
+        "200":
+          description: "User program was compiled and run, with possibly non-zero exit code."
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                exit_code:
+                  type: integer
+                result:
+                  type: integer
+        "default":
+          description: "Something went wrong."
+          schema:
+            type: object
+            properties:
+              details:
+                type: string
+                default: "Details of an error"
