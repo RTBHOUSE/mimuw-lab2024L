@@ -131,8 +131,7 @@ Run the Schema Registry as a background process:
 java -jar spring-cloud-schema-registry-server-1.1.5.jar > registry.log &
 ```
 
-To stop it just read the `registry.log` file and check the process PID (every line
-contains it) and just kill the application:
+To stop it just read the `registry.log` file and check the process PID (every line contains it) and just kill the application:
 
 ```bash
 kill <pid>
